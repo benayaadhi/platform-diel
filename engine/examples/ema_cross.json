@@ -1,0 +1,20 @@
+{
+  "name": "EMA Cross 20/50",
+  "symbol": "EURUSD",
+  "timeframe": "H1",
+  "indicators": [
+    { "id": "ema_fast", "type": "EMA", "source": "close", "period": 20 },
+    { "id": "ema_slow", "type": "EMA", "source": "close", "period": 50 }
+  ],
+  "entry_long":  "cross_over(ema_fast, ema_slow)",
+  "entry_short": "cross_under(ema_fast, ema_slow)",
+  "exit_long":   "cross_under(ema_fast, ema_slow)",
+  "exit_short":  "cross_over(ema_fast, ema_slow)",
+  "stop_loss":   { "type": "atr", "mult": 2.0, "atr_period": 14 },
+  "take_profit": { "type": "rr", "ratio": 1.5 },
+  "risk":        { "per_trade_pct": 1.0, "min_lot": 0.01, "lot_step": 0.01 },
+  "meta": {
+    "description": "Trend-following klasik: long saat EMA cepat memotong ke atas EMA lambat, exit saat berbalik. SL berbasis ATR, TP 1.5R.",
+    "author": "diel-sample"
+  }
+}

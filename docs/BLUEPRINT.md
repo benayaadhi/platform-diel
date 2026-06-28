@@ -242,15 +242,17 @@ Karena seluruh nilai = kepercayaan, ini bukan opsional:
 
 ## 13. Roadmap berfase
 
-### Fase 0 — Fondasi (engine + data) 🎯 *titik mulai berikutnya*
-- Skema DB + ingest data forex (Dukascopy EURUSD M1/tick).
-- Backtest engine inti: eksekusi spec DSL + biaya forex (spread/swap/commission).
-- 1 strategi contoh (EMA cross) jalan end-to-end di CLI, hasil reproducible.
-- **Deliverable:** "kasih spec → keluar metrik + equity curve yang bener."
+### Fase 0 — Fondasi (engine + data) ✅ *selesai — lihat `engine/`*
+- Ingester data forex (Dukascopy EURUSD) + loader CSV + generator sintetis.
+- Backtest engine inti: eksekusi spec DSL + biaya forex (spread/swap/commission), next-bar execution.
+- Strategi contoh (EMA cross) jalan end-to-end di CLI, hasil reproducible + 17 test.
+- **Deliverable tercapai:** "kasih spec → keluar metrik + equity curve yang bener."
 
-### Fase 1 — Verifikasi
-- Pipeline in-sample → OOS → walk-forward + perhitungan badge/score.
-- Robustness & overfit checks (PBO, sweep parameter).
+### Fase 1 — Verifikasi ✅ *selesai — lihat `engine/diel_engine/verification/`*
+- Pipeline in-sample → OOS → walk-forward + skor 0..100 & badge (Unverified/Backtested/Robust).
+- Optimisasi grid parameter (IS) lalu uji OOS.
+- Overfit checks: **PBO via CSCV** + robust-region fraction. Total 29 test.
+- **Deliverable tercapai:** "kasih spec → keluar badge yang sulit dipalsukan."
 
 ### Fase 2 — Web & sosial (flex)
 - Profil author, leaderboard, equity curve interaktif, halaman strategi publik.

@@ -63,8 +63,33 @@ def cmd_backtest(args) -> None:
         print(f"[equity curve -> {args.equity_out}]")
 
 
+def cmd_verify(args) -> None:
+    from .verification.verify import verify_strategy
+
+    spec = load_spec(args.strategy)  # validasi dulu
+    with open(args.strategy, "r", encoding="utf-8") as f:
+        spec_dict = json.load(f)
+    bars = _load_bars(args, spec)
+    costs = CostModel(spread_pips=args.spread, commission_per_lot=args.commission)
+
+    report = verify_strategy(
+        bars, spec_dict,
+        objective=args.objective, oos_ratio=args.oos_ratio,
+        n_folds=args.folds, n_slices=args.slices,
+        initial_balance=args.balance, costs=costs,
+    )
+    print(f"Bars     : {len(bars)}  "
+          f"({bars.index[0].date()} -> {bars.index[-1].date()})")
+    print(report.summary())
+
+    if args.json_out:
+        with open(args.json_out, "w", encoding="utf-8") as f:
+            json.dump(report.to_dict(), f, indent=2)
+        print(f"\n[laporan verifikasi -> {args.json_out}]")
+
+
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="diel_engine", description="Platform-DIEL backtest engine (Fase 0)")
+    p = argparse.ArgumentParser(prog="diel_engine", description="Platform-DIEL backtest engine (Fase 0-1)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     b = sub.add_parser("backtest", help="jalankan backtest satu strategi")
@@ -81,6 +106,25 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--json-out", dest="json_out", help="tulis hasil lengkap ke JSON")
     b.add_argument("--equity-out", dest="equity_out", help="tulis equity curve ke CSV")
     b.set_defaults(func=cmd_backtest)
+
+    v = sub.add_parser("verify", help="verifikasi berlapis (IS/OOS, walk-forward, PBO) -> badge")
+    v.add_argument("--strategy", required=True, help="path file spec JSON (boleh berisi param_grid)")
+    v.add_argument("--data", default="synthetic", choices=["synthetic", "csv", "dukascopy"])
+    v.add_argument("--csv", help="path CSV untuk --data csv")
+    v.add_argument("--bars", type=int, default=4000, help="jumlah bar (synthetic)")
+    v.add_argument("--seed", type=int, default=42, help="seed (synthetic)")
+    v.add_argument("--start", help="ISO date (dukascopy)")
+    v.add_argument("--end", help="ISO date (dukascopy)")
+    v.add_argument("--balance", type=float, default=10_000.0)
+    v.add_argument("--spread", type=float, default=1.0)
+    v.add_argument("--commission", type=float, default=3.5)
+    v.add_argument("--objective", default="cagr_mdd",
+                   help="cagr_mdd|sharpe|sortino|profit_factor|net_pnl|total_return|expectancy")
+    v.add_argument("--oos-ratio", dest="oos_ratio", type=float, default=0.3)
+    v.add_argument("--folds", type=int, default=4, help="jumlah fold walk-forward")
+    v.add_argument("--slices", type=int, default=8, help="jumlah slice untuk PBO (genap)")
+    v.add_argument("--json-out", dest="json_out", help="tulis laporan verifikasi ke JSON")
+    v.set_defaults(func=cmd_verify)
     return p
 
 

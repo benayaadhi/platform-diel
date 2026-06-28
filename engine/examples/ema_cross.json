@@ -13,6 +13,11 @@
   "stop_loss":   { "type": "atr", "mult": 2.0, "atr_period": 14 },
   "take_profit": { "type": "rr", "ratio": 1.5 },
   "risk":        { "per_trade_pct": 1.0, "min_lot": 0.01, "lot_step": 0.01 },
+  "param_grid": {
+    "indicators.ema_fast.period": [10, 15, 20, 25],
+    "indicators.ema_slow.period": [40, 50, 60],
+    "stop_loss.mult": [1.5, 2.0, 2.5]
+  },
   "meta": {
     "description": "Trend-following klasik: long saat EMA cepat memotong ke atas EMA lambat, exit saat berbalik. SL berbasis ATR, TP 1.5R.",
     "author": "diel-sample"
